@@ -84,36 +84,46 @@ public class Agent {
         // Get list of figure names for solutions
         List<String> solutionKeyList = createKeyList(figureMap, "[0-9]");
 
-        // Create list-matrix resembling RPM with null for placeholder on last entry
-//        List<List<RavensFigure>> ravensFiguresListLR =
-//                new ArrayList<>(getRavensMatrix(figureMap, figureKeyList, row, col));
-//        List<List<RavensFigure>> ravensFiguresListUD =
-//                new ArrayList<>(generateUpDownMatrix(ravensFiguresListLR));
+//        // Create list-matrix resembling RPM with null for placeholder on last entry
+////        List<List<RavensFigure>> ravensFiguresListLR =
+////                new ArrayList<>(getRavensMatrix(figureMap, figureKeyList, row, col));
+////        List<List<RavensFigure>> ravensFiguresListUD =
+////                new ArrayList<>(generateUpDownMatrix(ravensFiguresListLR));
+//
+//
+//        // Create a matrix representation for the figures
+//        List<List<BufferedImage>> figureImageMatrix = getMatrixRepresentation(figureMap, figureKeyList, row, col);
+//
+//        // Create a map of the figure images
+//        Map<String, BufferedImage> solutionImageMap = new HashMap<>();
+//
+//        for (String figureKey : solutionKeyList) {
+//            RavensFigure solutionFigure = figureMap.get(figureKey);
+//            BufferedImage image = null;
+//            try {
+//                image = ImageIO.read(new File(solutionFigure.getVisual()));
+//            } catch (IOException e) {
+//                throw new RuntimeException("Could not open specified image.", e);
+//            }
+//
+//            solutionImageMap.put(figureKey, image);
+//        }
+//
+//        String strategy = determineStrategy(figureImageMatrix, solutionImageMap, row, col);
 
-
-        // Create a matrix representation for the figures
-        List<List<BufferedImage>> figureImageMatrix = getMatrixRepresentation(figureMap, figureKeyList, row, col);
-
-        // Create a map of the figure images
-        Map<String, BufferedImage> solutionImageMap = new HashMap<>();
-
-        for (String figureKey : solutionKeyList) {
-            RavensFigure solutionFigure = figureMap.get(figureKey);
+        Map<String, BufferedImage> figureImageMap = new HashMap<>();
+        for (String figureKey : problem.getFigures().keySet()) {
             BufferedImage image = null;
             try {
-                image = ImageIO.read(new File(solutionFigure.getVisual()));
+                image = ImageIO.read(new File(problem.getFigures().get(figureKey).getVisual()));
             } catch (IOException e) {
                 throw new RuntimeException("Could not open specified image.", e);
             }
 
-            solutionImageMap.put(figureKey, image);
+            figureImageMap.put(figureKey, image);
         }
 
-        String strategy = determineStrategy(figureImageMatrix, solutionImageMap, row, col);
-
-
-
-
+        String strategy = determineStrategy(figureImageMap);
 
 
         return -1;
@@ -147,66 +157,73 @@ public class Agent {
         return figureImageMatrix;
     }
 
-    public String determineStrategy(List<List<BufferedImage>> figureImageMatrix,
-                                    Map<String, BufferedImage> solutionImageMap,
-                                    int row,
-                                    int col) {
+
+
+    public boolean areEqual(BufferedImage image1, BufferedImage image2) {
+        int diff = 0;
+
+        return false;
+    }
+
+    public String determineStrategy(Map<String, BufferedImage> figureImageMap) {
         String strategy = null;
 
+        //get the individual images
+        BufferedImage figureA = figureImageMap.get("A");
+        BufferedImage figureB = figureImageMap.get("B");
+        BufferedImage figureC = figureImageMap.get("C");
+        BufferedImage figureD = figureImageMap.get("D");
+        BufferedImage figureE = figureImageMap.get("E");
+        BufferedImage figureF = figureImageMap.get("F");
+        BufferedImage figureG = figureImageMap.get("G");
+        BufferedImage figureH = figureImageMap.get("H");
+
         // overlays
-        List<List<BufferedImage>> singleOverlayMatrixLR = new ArrayList<>();
-        for (List<BufferedImage> figureImageRow : figureImageMatrix) {
-            if (figureImageRow.size() == col) {
-                List<BufferedImage> overlayRow = new ArrayList<>();
-                for (int i = 0; i < figureImageRow.size() - 1; i++) {
-                    if (figureImageRow.get(i + 1) != null) { //if last row
-                        overlayRow.add(imageUtilities.add(figureImageRow.get(i), figureImageRow.get(i + 1)));
-                    }
-                }
-                singleOverlayMatrixLR.add(overlayRow);
-            }
-        }
+        BufferedImage rowAB = imageUtilities.add(figureA, figureB);
+        BufferedImage rowBC = imageUtilities.add(figureB, figureC);
+        BufferedImage rowDE = imageUtilities.add(figureD, figureE);
+        BufferedImage rowEF = imageUtilities.add(figureE, figureF);
 
-        List<BufferedImage> multiOverlayMatrixUD = new ArrayList<>();
-        for (int i = 0; i < col - 1; i++) {
-            BufferedImage image = null;
-            for (int j = 0; j < row - 1; j++) {
-                System.out.println("row:"+(j+1) +"  "+ "col:"+i);
-                if (image == null) //initially
-                    image = imageUtilities.multiply(figureImageMatrix.get(j).get(i), figureImageMatrix.get(j+1).get(i));
-                else
-                    image = imageUtilities.multiply(image, figureImageMatrix.get(j+1).get(i));
-                JFrame frame = new JFrame();
-                frame.getContentPane().setLayout(new FlowLayout());
-                frame.getContentPane().add(new JLabel(new ImageIcon(image)));
-                frame.pack();
-                frame.setVisible(true);
-                try {
-                    Thread.sleep(5000);
-                } catch(InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            multiOverlayMatrixUD.add(image);
-        }
+        BufferedImage colAD = imageUtilities.multiply(figureA, figureD);
+        BufferedImage colADG = imageUtilities.multiply(colAD, figureD);
 
-//        JFrame frame = new JFrame();
-//        frame.getContentPane().setLayout(new FlowLayout());
-//        frame.getContentPane().add(new JLabel(new ImageIcon(singleOverlayMatrixLR.get(0).get(0))));
-//        frame.pack();
-//        frame.setVisible(true);
-//
-//        try {
-//            Thread.sleep(5000);
-//        } catch(InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//        }
-
-
-
+        BufferedImage colBE = imageUtilities.multiply(figureB, figureE);
+        BufferedImage colBEH = imageUtilities.multiply(colBE, figureD);
 
         // common permutations
-//        List<List<BufferedImage>> permutationMatrix = generator.generatePermutations()
+        BufferedImage AB = imageUtilities.multiply(figureA, figureB);
+        BufferedImage AC = imageUtilities.multiply(figureA, figureC);
+        BufferedImage ABC = imageUtilities.multiply(AB, figureC);
+        BufferedImage DE = imageUtilities.multiply(figureD, figureE);
+        BufferedImage DF = imageUtilities.multiply(figureD, figureF);
+        BufferedImage DEF = imageUtilities.multiply(DE, figureF);
+
+        // diffs
+        BufferedImage difAB = imageUtilities.difference(AB, rowAB);
+        BufferedImage difDE = imageUtilities.difference(DE, rowDE);
+
+
+
+
+
+
+
+
+
+
+
+        JFrame frame = new JFrame();
+        frame.getContentPane().setLayout(new FlowLayout());
+        frame.getContentPane().add(new JLabel(new ImageIcon(difAB)));
+        frame.pack();
+        frame.setVisible(true);
+
+        try {
+            Thread.sleep(2000);
+        } catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
 
         return strategy;
     }
