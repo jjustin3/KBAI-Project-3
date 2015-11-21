@@ -5,7 +5,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.RescaleOp;
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by justinjackson on 11/18/15.
@@ -28,6 +29,28 @@ public class ImageUtilities {
                     newImage.setRGB(x, y, 0);
 
         return newImage;
+    }
+
+    public Map<String, Integer> getColors(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        Map<String, Integer> colorsMap = new HashMap<>();
+        colorsMap.put("black", 0);
+        colorsMap.put("white", 0);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (image.getRGB(x, y) == -16777216) {
+                    int black = colorsMap.get("black") + 1;
+                    colorsMap.put("black", black);
+                } else if (image.getRGB(x, y) == 0) {
+                    int white = colorsMap.get("white") + 1;
+                    colorsMap.put("white", white);
+                }
+            }
+        }
+
+        return colorsMap;
     }
 
 

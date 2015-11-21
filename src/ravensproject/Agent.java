@@ -160,7 +160,73 @@ public class Agent {
 
 
     public boolean areEqual(BufferedImage image1, BufferedImage image2) {
+        int width = Math.max(image1.getWidth(), image2.getWidth());
+        int height = Math.max(image1.getHeight(), image2.getHeight());
         int diff = 0;
+        // might not work because of negative values for black
+        // 0 = black
+        // 255 = white
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int img1Col = image1.getRGB(x, y) != 0 ? 0 : 255;
+                int img2Col = image1.getRGB(x, y) != 0 ? 0 : 255;
+                diff += Math.abs(img1Col - img2Col);
+            }
+        }
+
+        int components = width * height * 3;
+        double dist = (diff / 255.0 * 100) / components;
+        Map<String, Integer> image1Colors = imageUtilities.getColors(image1);
+        Map<String, Integer> image2Colors = imageUtilities.getColors(image2);
+        int[] image2Black = {10000, 0};
+
+        // Todo - might be able to trim this down and only work with Map
+        int[] image1Black = new int[2];
+        int[] image1White = new int [2];
+        if (image1Colors.keySet().size() > 1) {
+            image1Black[0] = image1Colors.get("black");
+            image1Black[1] = 0;
+            image1White[0] = image1Colors.get("white");
+            image1White[1] = 255;
+        } else {
+            if (image1Colors.keySet().contains("white")) {
+                image1Black[0] = image1Colors.get("black");
+                image1Black[1] = 0;
+                image1White[0] = 0;
+                image1White[1] = 255;
+            } else {
+                image1Black[0] = 0;
+                image1Black[1] = 0;
+                image1White[0] = image1Colors.get("white");
+                image1White[1] = 255;
+            }
+        }
+
+//        int[] image2Black = new int[2];
+        int[] image2White = new int [2];
+        if (image2Colors.keySet().size() > 1) {
+            image2Black[0] = image2Colors.get("black");
+            image2Black[1] = 0;
+            image2White[0] = image2Colors.get("white");
+            image2White[1] = 255;
+        } else {
+            if (image2Colors.keySet().contains("white")) {
+                image2Black[0] = image2Colors.get("black");
+                image2Black[1] = 0;
+                image2White[0] = 0;
+                image2White[1] = 255;
+            } else {
+                image2Black[0] = 0;
+                image2Black[1] = 0;
+                image2White[0] = image2Colors.get("white");
+                image2White[1] = 255;
+            }
+        }
+
+        Map<String, Double> stats = new HashMap<>();
+        stats.put("dist", dist);
+        stats.put("blk", (double) Math.abs(image1Black[0] - image2Black[0]));
+
 
         return false;
     }
