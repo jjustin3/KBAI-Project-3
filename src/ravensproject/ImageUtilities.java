@@ -53,6 +53,16 @@ public class ImageUtilities {
         return colorsMap;
     }
 
+    // Todo - create method compareImages that does the same thing as add but also returns what is different between them (difference)
+    // already have logic for this
+    public List<BufferedImage> compareImages(BufferedImage image1, BufferedImage image2) {
+        BufferedImage common = add(image1, image2);
+        BufferedImage delta = difference(image1, image2);
+        List<BufferedImage> returnList = new ArrayList<>();
+        returnList.add(common);
+        returnList.add(delta);
+        return returnList;
+    }
 
 
     // Operator methods

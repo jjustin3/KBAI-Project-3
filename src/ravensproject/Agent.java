@@ -223,16 +223,22 @@ public class Agent {
             }
         }
 
-        Map<String, Double> stats = new HashMap<>();
-        stats.put("dist", dist);
-        stats.put("blk", (double) Math.abs(image1Black[0] - image2Black[0]));
+//        Map<String, Double> stats = new HashMap<>();
+//        stats.put("dist", dist);
+//        stats.put("blk", (double) Math.abs(image1Black[0] - image2Black[0]));
 
+        return dist < 1.1 && Math.abs(image1Black[0] - image2Black[0]) < 105;
+    }
 
-        return false;
+    public boolean isShared(Map<String, BufferedImage> figureImageMap) {
+        // Todo - might not need delta image [1] ever!
+        BufferedImage sharedAB = imageUtilities.compareImages(figureImageMap.get("A"), figureImageMap.get("B")).get(0);
+        BufferedImage sharedDE = imageUtilities.compareImages(figureImageMap.get("D"), figureImageMap.get("E")).get(0);
+
+        return areEqual((sharedAB, figureImageMap.get("C")) && areEqual(sharedDE, figureImageMap.get("F"));
     }
 
     public String determineStrategy(Map<String, BufferedImage> figureImageMap) {
-        String strategy = null;
 
         //get the individual images
         BufferedImage figureA = figureImageMap.get("A");
@@ -268,16 +274,6 @@ public class Agent {
         BufferedImage difAB = imageUtilities.difference(AB, rowAB);
         BufferedImage difDE = imageUtilities.difference(DE, rowDE);
 
-
-
-
-
-
-
-
-
-
-
         JFrame frame = new JFrame();
         frame.getContentPane().setLayout(new FlowLayout());
         frame.getContentPane().add(new JLabel(new ImageIcon(difAB)));
@@ -290,8 +286,29 @@ public class Agent {
             Thread.currentThread().interrupt();
         }
 
+        if (areEqual(figureA, figureB) && areEqual(figureB, figureC))
+            if (areEqual(figureD, figureE) && areEqual(figureE, figureF))
+                return "row_equals";
+        else if ((areEqual(figureA, figureD) || areEqual(figureA, figureE) || areEqual(figureA, figureF))
+                    && (areEqual(figureB, figureD) || areEqual(figureB, figureE) || areEqual(figureB, figureF))
+                    && (areEqual(figureC, figureD) || areEqual(figureC, figureE) || areEqual(figureC, figureF)))
+                return "one_of_each";
+        else if (areEqual(rowAB, rowBC) && areEqual(rowDE, rowEF))
+                return "one cancels";
+        else if (areEqual(colADG, colBEH))
+                return "cancel_out";
+        else if (areEqual(AB, figureC) && areEqual(DE, figureF))
+                return "productAB";
+        else if (areEqual(AC, figureB) && areEqual(DF, figureE))
+                return "productAC";
+        else if (areEqual(difAB, figureC) && areEqual(difDE, figureF))
+                return "diffAB";
+        else if (isShared(figureImageMap))
+                return "shared";
+        else if (areEqual(ABC, DEF))
+                return "common_perms";
 
-        return strategy;
+        return "guess";
     }
 
 
