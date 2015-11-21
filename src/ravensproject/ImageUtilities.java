@@ -2,9 +2,6 @@ package ravensproject;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.RescaleOp;
-import java.awt.image.WritableRaster;
 import java.util.*;
 import java.util.List;
 
@@ -53,8 +50,7 @@ public class ImageUtilities {
         return colorsMap;
     }
 
-    // Todo - create method compareImages that does the same thing as add but also returns what is different between them (difference)
-    // already have logic for this
+    // Todo - return only one image (delta not needed)
     public List<BufferedImage> compareImages(BufferedImage image1, BufferedImage image2) {
         BufferedImage common = add(image1, image2);
         BufferedImage delta = difference(image1, image2);
