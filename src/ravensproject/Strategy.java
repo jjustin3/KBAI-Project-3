@@ -126,18 +126,18 @@ public class Strategy {
                 return applySharedStrategy(figMap, solKeyList);
             else
                 return pickTheOneNotSeen(figMap, solKeyList);
-        } else if (answers.size() == 1) {
+        } else {
             return answers.get(0);
         }
 
-        return -1;
+//        return -1;
     }
 
     public int applySharedStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        BufferedImage sharedGE = imageUtilities.compareImages(figMap.get("G"), figMap.get("H")).get(0);
+        BufferedImage sharedGH = imageUtilities.compareImages(figMap.get("G"), figMap.get("H")).get(0);
 
         for (String solutionKey : solKeyList)
-            if (areEqual(sharedGE, figMap.get(solutionKey)))
+            if (areEqual(sharedGH, figMap.get(solutionKey)))
                 return Integer.parseInt(solutionKey);
         return -1;
     }
@@ -155,9 +155,11 @@ public class Strategy {
                     if (answers.contains(solution))
                         answers.remove(solution);
 
+//        System.out.println(answers);
+
         if (answers.size() == 1)
             return Integer.parseInt(answers.get(0));
-        else if (answers.size() > 1 && answers.size() < 3)
+        else if (answers.size() > 1 && answers.size() < 3) // toggle after penalty determined
             return Integer.parseInt(answers.get(random.nextInt(answers.size())));
         return -1;
     }
@@ -189,7 +191,7 @@ public class Strategy {
 
         for (String solutionKey : solKeyList) {
             BufferedImage candidate = imageUtilities.multiply(GH, figMap.get(solutionKey));
-            if (areEqual(candidate, DEF))
+            if (areEqual(DEF, candidate))
                 return Integer.parseInt(solutionKey);
         }
 

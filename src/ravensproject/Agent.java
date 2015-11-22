@@ -93,45 +93,45 @@ public class Agent {
             figureImageMap.put(figureKey, image);
         }
 
-        String chosenStrategy = determineStrategy(figureImageMap);
-        System.out.println(chosenStrategy);
+        List<String> strategies = determineStrategy(figureImageMap);
+        System.out.println(strategies);
 
-        int solution = -1;
+        int solution;
 
         // Todo - change all to if statements only so skip is not done
-        if (chosenStrategy.equals("row_equals")) {
+        if (strategies.contains("row_equals")) {
             solution = strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("one_of_each")) { //Todo - check if returns -1 and skip if so
+        } else if (strategies.contains("one_of_each")) {
             solution = strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("one_cancels")) {
+        } else if (strategies.contains("one_cancels")) {
             solution = strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("cancel_out")) {
+        } else if (strategies.contains("cancel_out")) {
             solution = strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("common_perms")) {
+        } else if (strategies.contains("common_perms")) {
             solution = strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("productAB")) {
+        } else if (strategies.contains("productAB")) {
             solution = strategy.applyProductABStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("productAC")) {
+        } else if (strategies.contains("productAC")) {
             solution = strategy.applyProductACStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("diffAB")) {
+        } else if (strategies.contains("diffAB")) {
             solution = strategy.applyDiffABStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("shared")) {
+        } else if (strategies.contains("shared")) {
             solution = strategy.applySharedStrategy(figureImageMap, solutionKeyList);
             if (solution == -1)
                 solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
@@ -142,7 +142,7 @@ public class Agent {
         return solution;
     }
 
-    public String determineStrategy(Map<String, BufferedImage> figureImageMap) {
+    public List<String> determineStrategy(Map<String, BufferedImage> figureImageMap) {
 
         // get the individual images
         BufferedImage figureA = figureImageMap.get("A");
@@ -194,29 +194,32 @@ public class Agent {
 
 
 //        System.out.println("areEqual = "+(strategy.areEqual(rowAB, rowBC) && strategy.areEqual(rowDE, rowEF)));
+
+        List<String> strategies = new ArrayList<>();
+
         if (strategy.areEqual(figureA, figureB) && strategy.areEqual(figureB, figureC))
             if (strategy.areEqual(figureD, figureE) && strategy.areEqual(figureE, figureF))
-                return "row_equals";
+                strategies.add("row_equals");
         if ((strategy.areEqual(figureA, figureD) || strategy.areEqual(figureA, figureE) || strategy.areEqual(figureA, figureF))
                     && (strategy.areEqual(figureB, figureD) || strategy.areEqual(figureB, figureE) || strategy.areEqual(figureB, figureF))
                     && (strategy.areEqual(figureC, figureD) || strategy.areEqual(figureC, figureE) || strategy.areEqual(figureC, figureF)))
-                return "one_of_each";
+            strategies.add("one_of_each");
         if (strategy.areEqual(rowAB, rowBC) && strategy.areEqual(rowDE, rowEF))
-                return "one_cancels";
+            strategies.add("one_cancels");
         if (strategy.areEqual(colADG, colBEH))
-                return "cancel_out";
+            strategies.add("cancel_out");
         if (strategy.areEqual(AB, figureC) && strategy.areEqual(DE, figureF))
-                return "productAB";
+            strategies.add("productAB");
         if (strategy.areEqual(AC, figureB) && strategy.areEqual(DF, figureE))
-                return "productAC";
+            strategies.add("productAC");
         if (strategy.areEqual(difAB, figureC) && strategy.areEqual(difDE, figureF))
-                return "diffAB";
+            strategies.add("diffAB");
         if (strategy.isShared(figureImageMap))
-                return "shared";
+            strategies.add("shared");
         if (strategy.areEqual(ABC, DEF))
-                return "common_perms";
+            strategies.add("common_perms");
 
-        return "guess";
+        return strategies;
     }
 
     /**
@@ -243,4 +246,6 @@ public class Agent {
 /* Todo:
  * get rid of image compareImages delta buffered image
  * check current image methods vs imageChops methods
+ * guess more
+ * make it where multiple strategies are chosen
  */
