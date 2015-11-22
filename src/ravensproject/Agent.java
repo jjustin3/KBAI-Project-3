@@ -30,6 +30,7 @@ public class Agent {
     private Random random;
     private ImageUtilities imageUtilities;
     private Strategy strategy;
+    private String problem;
 
     /**
      * The default constructor for your Agent. Make sure to execute any
@@ -72,6 +73,7 @@ public class Agent {
      */
     public int Solve(RavensProblem problem) {
         System.out.println("Solving " + problem.getName());
+        this.problem = problem.getName();
 
         // Retrieve figures from problem
         Map<String, RavensFigure> figureMap = problem.getFigures();
@@ -92,42 +94,52 @@ public class Agent {
         }
 
         String chosenStrategy = determineStrategy(figureImageMap);
-//        System.out.println(chosenStrategy);
+        System.out.println(chosenStrategy);
+
+        int solution = -1;
 
         // Todo - change all to if statements only so skip is not done
-        if (chosenStrategy.equals("row_equals") && strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList) != -1) {
-            return strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("one_of_each") && strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList) != -1) { //Todo - check if returns -1 and skip if so
-            System.out.println("picking one_of_each");
-            return strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("one_cancels") && strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList) != -1) {
-            System.out.println("picking one_cancels");
-            return strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("cancel_out") && strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList) != -1) {
-            System.out.println("picking cancel_out");
-            return strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("common_perms") && strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList) != -1) {
-            System.out.println("picking common_perms");
-            return strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("productAB") && strategy.applyProductABStrategy(figureImageMap, solutionKeyList) != -1) {
-            System.out.println("picking productAB");
-            return strategy.applyProductABStrategy(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("productAC") && strategy.applyProductACStrategy(figureImageMap, solutionKeyList) != -1) {
-            System.out.println("picking productAC");
-            return strategy.applyProductACStrategy(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("diffAB") && strategy.applyDiffABStrategy(figureImageMap, solutionKeyList) != -1) {
-            System.out.println("picking diffAB");
-            return strategy.applyDiffABStrategy(figureImageMap, solutionKeyList);
-        } else if (chosenStrategy.equals("shared") && strategy.applySharedStrategy(figureImageMap, solutionKeyList) != -1) {
-            System.out.println("picking shared");
-            return strategy.applySharedStrategy(figureImageMap, solutionKeyList);
+        if (chosenStrategy.equals("row_equals")) {
+            solution = strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("one_of_each")) { //Todo - check if returns -1 and skip if so
+            solution = strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("one_cancels")) {
+            solution = strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("cancel_out")) {
+            solution = strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("common_perms")) {
+            solution = strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("productAB")) {
+            solution = strategy.applyProductABStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("productAC")) {
+            solution = strategy.applyProductACStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("diffAB")) {
+            solution = strategy.applyDiffABStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("shared")) {
+            solution = strategy.applySharedStrategy(figureImageMap, solutionKeyList);
+            if (solution == -1)
+                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
         } else {
-            System.out.println("picking one not seen");
-            return strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+            solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
         }
 
-        // never reaches here currently
-//        return -1;
+        return solution;
     }
 
     public String determineStrategy(Map<String, BufferedImage> figureImageMap) {
@@ -149,10 +161,10 @@ public class Agent {
         BufferedImage rowEF = imageUtilities.add(figureE, figureF);
 
         BufferedImage colAD = imageUtilities.multiply(figureA, figureD);
-        BufferedImage colADG = imageUtilities.multiply(colAD, figureD);
+        BufferedImage colADG = imageUtilities.multiply(colAD, figureG);
 
         BufferedImage colBE = imageUtilities.multiply(figureB, figureE);
-        BufferedImage colBEH = imageUtilities.multiply(colBE, figureD);
+        BufferedImage colBEH = imageUtilities.multiply(colBE, figureH);
 
         // common permutations
         BufferedImage AB = imageUtilities.multiply(figureA, figureB);
@@ -166,39 +178,42 @@ public class Agent {
         BufferedImage difAB = imageUtilities.difference(AB, rowAB);
         BufferedImage difDE = imageUtilities.difference(DE, rowDE);
 
-//        JFrame frame = new JFrame();
-//        frame.getContentPane().setLayout(new FlowLayout());
-//        frame.getContentPane().add(new JLabel(new ImageIcon(difAB)));
-//        frame.pack();
-//        frame.setVisible(true);
-//
-//        try {
-//            Thread.sleep(2000);
-//        } catch(InterruptedException e) {
-//            Thread.currentThread().interrupt();
+//        if (problem.equals("Basic Problem D-09")) {
+//            JFrame frame = new JFrame();
+//            frame.getContentPane().setLayout(new FlowLayout());
+//            frame.getContentPane().add(new JLabel(new ImageIcon(ABC)));
+//            frame.getContentPane().add(new JLabel(new ImageIcon(DEF)));
+//            frame.pack();
+//            frame.setVisible(true);
+//            try {
+//                Thread.sleep(11000);
+//            } catch(InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
 //        }
 
-//        System.out.println("FIGURE AB, BC =============");
+
+//        System.out.println("areEqual = "+(strategy.areEqual(rowAB, rowBC) && strategy.areEqual(rowDE, rowEF)));
         if (strategy.areEqual(figureA, figureB) && strategy.areEqual(figureB, figureC))
             if (strategy.areEqual(figureD, figureE) && strategy.areEqual(figureE, figureF))
                 return "row_equals";
-        else if ((strategy.areEqual(figureA, figureD) || strategy.areEqual(figureA, figureE) || strategy.areEqual(figureA, figureF))
+        if ((strategy.areEqual(figureA, figureD) || strategy.areEqual(figureA, figureE) || strategy.areEqual(figureA, figureF))
                     && (strategy.areEqual(figureB, figureD) || strategy.areEqual(figureB, figureE) || strategy.areEqual(figureB, figureF))
                     && (strategy.areEqual(figureC, figureD) || strategy.areEqual(figureC, figureE) || strategy.areEqual(figureC, figureF)))
                 return "one_of_each";
-        else if (strategy.areEqual(rowAB, rowBC) && strategy.areEqual(rowDE, rowEF))
-                return "one cancels";
-        else if (strategy.areEqual(colADG, colBEH))
+        if (strategy.areEqual(rowAB, rowBC) && strategy.areEqual(rowDE, rowEF))
+                return "one_cancels";
+        if (strategy.areEqual(colADG, colBEH))
                 return "cancel_out";
-        else if (strategy.areEqual(AB, figureC) && strategy.areEqual(DE, figureF))
+        if (strategy.areEqual(AB, figureC) && strategy.areEqual(DE, figureF))
                 return "productAB";
-        else if (strategy.areEqual(AC, figureB) && strategy.areEqual(DF, figureE))
+        if (strategy.areEqual(AC, figureB) && strategy.areEqual(DF, figureE))
                 return "productAC";
-        else if (strategy.areEqual(difAB, figureC) && strategy.areEqual(difDE, figureF))
+        if (strategy.areEqual(difAB, figureC) && strategy.areEqual(difDE, figureF))
                 return "diffAB";
-        else if (strategy.isShared(figureImageMap))
+        if (strategy.isShared(figureImageMap))
                 return "shared";
-        else if (strategy.areEqual(ABC, DEF))
+        if (strategy.areEqual(ABC, DEF))
                 return "common_perms";
 
         return "guess";

@@ -1,10 +1,12 @@
 package ravensproject;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by justinjackson on 11/22/15.
@@ -12,9 +14,11 @@ import java.util.Map;
 public class Strategy {
 
     private ImageUtilities imageUtilities;
+    private Random random;
 
     public Strategy(ImageUtilities imageUtilities) {
         this.imageUtilities = imageUtilities;
+        random = new Random();
     }
 
     public boolean areEqual(BufferedImage image1, BufferedImage image2) {
@@ -23,74 +27,48 @@ public class Strategy {
         int diff = 0;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                //uncomment these to get something working...
-//                int img1Col = image1.getRGB(x, y) != 0 ? 0 : 255;
-//                int img2Col = image1.getRGB(x, y) != 0 ? 0 : 255;
                 diff += image1.getRGB(x, y) != image2.getRGB(x, y) ? 255 : 0;
-//                diff += Math.abs(img1Col - img2Col);
             }
         }
 
         int components = width * height * 3;
-//        System.out.println("components: " + components);
         double dist = (diff / 255.0 * 100) / components;
-//        System.out.println("diff: " + diff);
-        System.out.println("dist: " + dist);
 
         Map<String, Integer> image1Colors = imageUtilities.getColors(image1);
         Map<String, Integer> image2Colors = imageUtilities.getColors(image2);
-        int[] image2Black = {10000, 0};
 
         // Todo - might be able to trim this down and only work with Map
         int[] image1Black = new int[2];
-        int[] image1White = new int [2];
         if (image1Colors.keySet().size() > 1) {
             image1Black[0] = image1Colors.get("black");
             image1Black[1] = 0;
-            image1White[0] = image1Colors.get("white");
-            image1White[1] = 255;
         } else {
             if (image1Colors.keySet().contains("white")) {
                 image1Black[0] = image1Colors.get("black");
                 image1Black[1] = 0;
-                image1White[0] = 0;
-                image1White[1] = 255;
             } else {
                 image1Black[0] = 0;
                 image1Black[1] = 0;
-                image1White[0] = image1Colors.get("white");
-                image1White[1] = 255;
             }
         }
 
-//        int[] image2Black = new int[2];
-        int[] image2White = new int [2];
+        int[] image2Black = {10000, 0};
         if (image2Colors.keySet().size() > 1) {
             image2Black[0] = image2Colors.get("black");
             image2Black[1] = 0;
-            image2White[0] = image2Colors.get("white");
-            image2White[1] = 255;
         } else {
             if (image2Colors.keySet().contains("white")) {
                 image2Black[0] = image2Colors.get("black");
                 image2Black[1] = 0;
-                image2White[0] = 0;
-                image2White[1] = 255;
             } else {
                 image2Black[0] = 0;
                 image2Black[1] = 0;
-                image2White[0] = image2Colors.get("white");
-                image2White[1] = 255;
             }
         }
 
-//        Map<String, Double> stats = new HashMap<>();
-//        stats.put("dist", dist);
-//        stats.put("blk", (double) Math.abs(image1Black[0] - image2Black[0]));
-//        System.out.println("dist: " + dist);
-//        System.out.println("blk: " + Math.abs(image1Black[0] - image2Black[0]));
+//        System.out.println("dist: "+dist+"     blk: "+Math.abs(image1Black[0] - image2Black[0]));
 
-        return dist < 1.1 && Math.abs(image1Black[0] - image2Black[0]) < 105;
+        return dist < 1.3 && Math.abs(image1Black[0] - image2Black[0]) < 205; // < 1.1 and < 105 // < 1.3 and < 205
     }
 
     public boolean isShared(Map<String, BufferedImage> figureImageMap) {
@@ -133,7 +111,6 @@ public class Strategy {
     public int applyOneCancelsStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
         BufferedImage rowCF = imageUtilities.add(figMap.get("C"), figMap.get("F"));
         BufferedImage rowGH = imageUtilities.add(figMap.get("G"), figMap.get("H"));
-        BufferedImage rowHF = imageUtilities.add(figMap.get("H"), figMap.get("F"));
         List<Integer> answers = new ArrayList<>();
 
         for (String solutionKey : solKeyList) {
@@ -158,6 +135,7 @@ public class Strategy {
 
     public int applySharedStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
         BufferedImage sharedGE = imageUtilities.compareImages(figMap.get("G"), figMap.get("H")).get(0);
+
         for (String solutionKey : solKeyList)
             if (areEqual(sharedGE, figMap.get(solutionKey)))
                 return Integer.parseInt(solutionKey);
@@ -179,7 +157,8 @@ public class Strategy {
 
         if (answers.size() == 1)
             return Integer.parseInt(answers.get(0));
-        // Todo - create a do not guess variable that can be analyzed here to determine if guess is returned
+        else if (answers.size() > 1 && answers.size() < 3)
+            return Integer.parseInt(answers.get(random.nextInt(answers.size())));
         return -1;
     }
 

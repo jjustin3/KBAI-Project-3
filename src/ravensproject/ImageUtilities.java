@@ -10,24 +10,6 @@ import java.util.List;
  */
 public class ImageUtilities {
 
-    public BufferedImage invertImage(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics graphics = newImage.getGraphics();
-        graphics.setColor(Color.BLACK);
-        graphics.fillRect(0, 0, width, height);
-        graphics.dispose();
-
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
-                if (image.getRGB(x, y) == -16777216)
-                    newImage.setRGB(x, y, 0);
-
-        return newImage;
-    }
-
     public Map<String, Integer> getColors(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -88,6 +70,7 @@ public class ImageUtilities {
         BufferedImage newImage = new BufferedImage(width, height, image1.getType());
 
         Graphics graphics = newImage.getGraphics();
+        graphics.setColor(Color.WHITE);
         graphics.drawImage(image1, 0, 0, null);
         graphics.dispose();
 
@@ -106,7 +89,7 @@ public class ImageUtilities {
         BufferedImage newImage = new BufferedImage(width, height, image1.getType());
 
         Graphics graphics = newImage.getGraphics();
-        graphics.setColor(Color.BLACK);
+        graphics.setColor(Color.WHITE);
         graphics.drawImage(image1, 0, 0, null);
         graphics.dispose();
 
