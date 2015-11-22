@@ -29,6 +29,7 @@ public class Agent {
     private Generator generator;
     private Random random;
     private ImageUtilities imageUtilities;
+    private Strategy strategy;
 
     /**
      * The default constructor for your Agent. Make sure to execute any
@@ -42,6 +43,7 @@ public class Agent {
         generator = new Generator();
         random = new Random();
         imageUtilities = new ImageUtilities();
+        strategy = new Strategy(imageUtilities);
     }
     /**
      * The primary method for solving incoming Raven's Progressive Matrices.
@@ -89,118 +91,48 @@ public class Agent {
             figureImageMap.put(figureKey, image);
         }
 
-        String strategy = determineStrategy(figureImageMap);
+        String chosenStrategy = determineStrategy(figureImageMap);
+//        System.out.println(chosenStrategy);
 
         // Todo - change all to if statements only so skip is not done
-        if (strategy.equals("row_equals")) {
-            for (String solutionKey : solutionKeyList) {
-                if (areEqual(figureImageMap.get("H"), figureImageMap.get(solutionKey))) {
-                    return Integer.parseInt(solutionKey);
-                }
-            }
-        } else if (strategy.equals("one_of_each") && applyOneOfEachStrategy(figureImageMap, solutionKeyList) != -1) { //Todo - check if returns -1 and skip if so
-            return applyOneOfEachStrategy(figureImageMap, solutionKeyList);
-        } else if (strategy.equals("one_cancels") && applyOneCancelsStrategy(figureImageMap, solutionKeyList) != -1) {
-            return applyOneCancelsStrategy(figureImageMap, solutionKeyList);
-        } else if (strategy.equals("cancel_out") && applyCancelOutStrategy(figureImageMap, solutionKeyList) != -1) {
-            return applyCancelOutStrategy(figureImageMap, solutionKeyList);
-        } else if (strategy.equals("common_perms") && applyCommonPermsStrategy(figureImageMap, solutionKeyList) != -1) {
-            return applyCommonPermsStrategy(figureImageMap, solutionKeyList);
-        } else if (strategy.equals("productAB") && applyProductABStrategy(figureImageMap, solutionKeyList) != -1) {
-            return applyProductABStrategy(figureImageMap, solutionKeyList);
-        } else if (strategy.equals("productAC") && applyProductACStrategy(figureImageMap, solutionKeyList) != -1) {
-            return applyProductACStrategy(figureImageMap, solutionKeyList);
-        } else if (strategy.equals("diffAB") && applyDiffABStrategy(figureImageMap, solutionKeyList) != -1) {
-            return applyDiffABStrategy(figureImageMap, solutionKeyList);
-        } else if (strategy.equals("shared") && applySharedStrategy(figureImageMap, solutionKeyList) != -1) {
-            return applySharedStrategy(figureImageMap, solutionKeyList);
+        if (chosenStrategy.equals("row_equals") && strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList) != -1) {
+            return strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("one_of_each") && strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList) != -1) { //Todo - check if returns -1 and skip if so
+            System.out.println("picking one_of_each");
+            return strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("one_cancels") && strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList) != -1) {
+            System.out.println("picking one_cancels");
+            return strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("cancel_out") && strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList) != -1) {
+            System.out.println("picking cancel_out");
+            return strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("common_perms") && strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList) != -1) {
+            System.out.println("picking common_perms");
+            return strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("productAB") && strategy.applyProductABStrategy(figureImageMap, solutionKeyList) != -1) {
+            System.out.println("picking productAB");
+            return strategy.applyProductABStrategy(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("productAC") && strategy.applyProductACStrategy(figureImageMap, solutionKeyList) != -1) {
+            System.out.println("picking productAC");
+            return strategy.applyProductACStrategy(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("diffAB") && strategy.applyDiffABStrategy(figureImageMap, solutionKeyList) != -1) {
+            System.out.println("picking diffAB");
+            return strategy.applyDiffABStrategy(figureImageMap, solutionKeyList);
+        } else if (chosenStrategy.equals("shared") && strategy.applySharedStrategy(figureImageMap, solutionKeyList) != -1) {
+            System.out.println("picking shared");
+            return strategy.applySharedStrategy(figureImageMap, solutionKeyList);
         } else {
-            return pickTheOneNotSeen(figureImageMap, solutionKeyList);
+            System.out.println("picking one not seen");
+            return strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
         }
 
         // never reaches here currently
-        return -1;
-    }
-
-    public boolean areEqual(BufferedImage image1, BufferedImage image2) {
-        int width = Math.max(image1.getWidth(), image2.getWidth());
-        int height = Math.max(image1.getHeight(), image2.getHeight());
-        int diff = 0;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int img1Col = image1.getRGB(x, y) != 0 ? 0 : 255;
-                int img2Col = image1.getRGB(x, y) != 0 ? 0 : 255;
-                diff += Math.abs(img1Col - img2Col);
-            }
-        }
-
-        int components = width * height * 3;
-        double dist = (diff / 255.0 * 100) / components;
-        Map<String, Integer> image1Colors = imageUtilities.getColors(image1);
-        Map<String, Integer> image2Colors = imageUtilities.getColors(image2);
-        int[] image2Black = {10000, 0};
-
-        // Todo - might be able to trim this down and only work with Map
-        int[] image1Black = new int[2];
-        int[] image1White = new int [2];
-        if (image1Colors.keySet().size() > 1) {
-            image1Black[0] = image1Colors.get("black");
-            image1Black[1] = 0;
-            image1White[0] = image1Colors.get("white");
-            image1White[1] = 255;
-        } else {
-            if (image1Colors.keySet().contains("white")) {
-                image1Black[0] = image1Colors.get("black");
-                image1Black[1] = 0;
-                image1White[0] = 0;
-                image1White[1] = 255;
-            } else {
-                image1Black[0] = 0;
-                image1Black[1] = 0;
-                image1White[0] = image1Colors.get("white");
-                image1White[1] = 255;
-            }
-        }
-
-//        int[] image2Black = new int[2];
-        int[] image2White = new int [2];
-        if (image2Colors.keySet().size() > 1) {
-            image2Black[0] = image2Colors.get("black");
-            image2Black[1] = 0;
-            image2White[0] = image2Colors.get("white");
-            image2White[1] = 255;
-        } else {
-            if (image2Colors.keySet().contains("white")) {
-                image2Black[0] = image2Colors.get("black");
-                image2Black[1] = 0;
-                image2White[0] = 0;
-                image2White[1] = 255;
-            } else {
-                image2Black[0] = 0;
-                image2Black[1] = 0;
-                image2White[0] = image2Colors.get("white");
-                image2White[1] = 255;
-            }
-        }
-
-//        Map<String, Double> stats = new HashMap<>();
-//        stats.put("dist", dist);
-//        stats.put("blk", (double) Math.abs(image1Black[0] - image2Black[0]));
-
-        return dist < 1.1 && Math.abs(image1Black[0] - image2Black[0]) < 105;
-    }
-
-    public boolean isShared(Map<String, BufferedImage> figureImageMap) {
-        // Todo - might not need delta image [1] ever!
-        BufferedImage sharedAB = imageUtilities.compareImages(figureImageMap.get("A"), figureImageMap.get("B")).get(0);
-        BufferedImage sharedDE = imageUtilities.compareImages(figureImageMap.get("D"), figureImageMap.get("E")).get(0);
-
-        return areEqual(sharedAB, figureImageMap.get("C")) && areEqual(sharedDE, figureImageMap.get("F"));
+//        return -1;
     }
 
     public String determineStrategy(Map<String, BufferedImage> figureImageMap) {
 
-        //get the individual images
+        // get the individual images
         BufferedImage figureA = figureImageMap.get("A");
         BufferedImage figureB = figureImageMap.get("B");
         BufferedImage figureC = figureImageMap.get("C");
@@ -246,168 +178,30 @@ public class Agent {
 //            Thread.currentThread().interrupt();
 //        }
 
-        if (areEqual(figureA, figureB) && areEqual(figureB, figureC))
-            if (areEqual(figureD, figureE) && areEqual(figureE, figureF))
+//        System.out.println("FIGURE AB, BC =============");
+        if (strategy.areEqual(figureA, figureB) && strategy.areEqual(figureB, figureC))
+            if (strategy.areEqual(figureD, figureE) && strategy.areEqual(figureE, figureF))
                 return "row_equals";
-        else if ((areEqual(figureA, figureD) || areEqual(figureA, figureE) || areEqual(figureA, figureF))
-                    && (areEqual(figureB, figureD) || areEqual(figureB, figureE) || areEqual(figureB, figureF))
-                    && (areEqual(figureC, figureD) || areEqual(figureC, figureE) || areEqual(figureC, figureF)))
+        else if ((strategy.areEqual(figureA, figureD) || strategy.areEqual(figureA, figureE) || strategy.areEqual(figureA, figureF))
+                    && (strategy.areEqual(figureB, figureD) || strategy.areEqual(figureB, figureE) || strategy.areEqual(figureB, figureF))
+                    && (strategy.areEqual(figureC, figureD) || strategy.areEqual(figureC, figureE) || strategy.areEqual(figureC, figureF)))
                 return "one_of_each";
-        else if (areEqual(rowAB, rowBC) && areEqual(rowDE, rowEF))
+        else if (strategy.areEqual(rowAB, rowBC) && strategy.areEqual(rowDE, rowEF))
                 return "one cancels";
-        else if (areEqual(colADG, colBEH))
+        else if (strategy.areEqual(colADG, colBEH))
                 return "cancel_out";
-        else if (areEqual(AB, figureC) && areEqual(DE, figureF))
+        else if (strategy.areEqual(AB, figureC) && strategy.areEqual(DE, figureF))
                 return "productAB";
-        else if (areEqual(AC, figureB) && areEqual(DF, figureE))
+        else if (strategy.areEqual(AC, figureB) && strategy.areEqual(DF, figureE))
                 return "productAC";
-        else if (areEqual(difAB, figureC) && areEqual(difDE, figureF))
+        else if (strategy.areEqual(difAB, figureC) && strategy.areEqual(difDE, figureF))
                 return "diffAB";
-        else if (isShared(figureImageMap))
+        else if (strategy.isShared(figureImageMap))
                 return "shared";
-        else if (areEqual(ABC, DEF))
+        else if (strategy.areEqual(ABC, DEF))
                 return "common_perms";
 
         return "guess";
-    }
-
-    public int applyOneOfEachStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        String missingFigure;
-        if (areEqual(figMap.get("A"), figMap.get("G")) || areEqual(figMap.get("A"), figMap.get("H"))) {
-            if (areEqual(figMap.get("B"), figMap.get("G")) || areEqual(figMap.get("B"), figMap.get("H"))) {
-                if (areEqual(figMap.get("C"), figMap.get("G")) || areEqual(figMap.get("C"), figMap.get("H"))) {
-                    return -1;
-                } else {
-                    missingFigure = "C";
-                }
-            } else {
-                missingFigure = "B";
-            }
-        } else {
-            missingFigure = "A";
-        }
-
-        for (String solutionKey : solKeyList)
-            if (areEqual(figMap.get(missingFigure), figMap.get(solutionKey)))
-                return Integer.parseInt(solutionKey);
-        return -1;
-    }
-
-    public int applyOneCancelsStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        BufferedImage rowCF = imageUtilities.add(figMap.get("C"), figMap.get("F"));
-        BufferedImage rowGH = imageUtilities.add(figMap.get("G"), figMap.get("H"));
-        BufferedImage rowHF = imageUtilities.add(figMap.get("H"), figMap.get("F"));
-        List<Integer> answers = new ArrayList<>();
-
-        for (String solutionKey : solKeyList) {
-            BufferedImage candidate1 = imageUtilities.add(rowCF, figMap.get(solutionKey));
-            BufferedImage candidate2 = imageUtilities.add(rowGH, figMap.get(solutionKey));
-
-            if (areEqual(rowCF, candidate1) && areEqual(rowGH, candidate2))
-                answers.add(Integer.parseInt(solutionKey));
-        }
-
-        if (answers.size() != 1) {
-            if (isShared(figMap))
-                return applySharedStrategy(figMap, solKeyList);
-            else
-                return pickTheOneNotSeen(figMap, solKeyList);
-        } else if (answers.size() == 1) {
-            return answers.get(0);
-        }
-
-        return -1;
-    }
-
-    public int applySharedStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        BufferedImage sharedGE = imageUtilities.compareImages(figMap.get("G"), figMap.get("H")).get(0);
-        for (String solutionKey : solKeyList)
-            if (areEqual(sharedGE, figMap.get(solutionKey)))
-                return Integer.parseInt(solutionKey);
-        return -1;
-    }
-
-    public int pickTheOneNotSeen(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        List<String> figures = new ArrayList<>();
-        List<String> answers = new ArrayList<>(solKeyList);
-        for (String figureKey : figMap.keySet())
-            if (!solKeyList.contains(figureKey))
-                figures.add(figureKey);
-
-        for (String figure : figures)
-            for (String solution : solKeyList)
-                if (areEqual(figMap.get(figure), figMap.get(solution)))
-                    if (answers.contains(solution))
-                        answers.remove(solution);
-
-        if (answers.size() == 1)
-            return Integer.parseInt(answers.get(0));
-        // Todo - create a do not guess variable that can be analyzed here to determine if guess is returned
-        return -1;
-    }
-
-    public int applyCancelOutStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        BufferedImage figureA = figMap.get("A");
-        BufferedImage figureC = figMap.get("C");
-        BufferedImage figureD = figMap.get("D");
-        BufferedImage figureF = figMap.get("F");
-        BufferedImage figureG = figMap.get("G");
-
-        BufferedImage colAD = imageUtilities.multiply(figureA, figureD);
-        BufferedImage colADG = imageUtilities.multiply(colAD, figureG);
-        BufferedImage colCF = imageUtilities.multiply(figureC, figureF);
-
-        for (String solutionKey : solKeyList) {
-            BufferedImage candidate = imageUtilities.multiply(colCF, figMap.get(solutionKey));
-            if (areEqual(candidate, colADG))
-                return Integer.parseInt(solutionKey);
-        }
-
-        return -1;
-    }
-
-    public int applyCommonPermsStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        BufferedImage DE = imageUtilities.multiply(figMap.get("D"), figMap.get("E"));
-        BufferedImage GH = imageUtilities.multiply(figMap.get("G"), figMap.get("H"));
-        BufferedImage DEF = imageUtilities.multiply(DE, figMap.get("F"));
-
-        for (String solutionKey : solKeyList) {
-            BufferedImage candidate = imageUtilities.multiply(GH, figMap.get(solutionKey));
-            if (areEqual(candidate, DEF))
-                return Integer.parseInt(solutionKey);
-        }
-
-        return pickTheOneNotSeen(figMap, solKeyList);
-    }
-
-    public int applyProductABStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        BufferedImage GH = imageUtilities.multiply(figMap.get("G"), figMap.get("H"));
-
-        for (String solutionKey : solKeyList)
-            if (areEqual(GH, figMap.get(solutionKey)))
-                return Integer.parseInt(solutionKey);
-
-        return pickTheOneNotSeen(figMap, solKeyList);
-    }
-
-    public int applyProductACStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        for (String solutionKey : solKeyList) {
-            BufferedImage candidate = imageUtilities.multiply(figMap.get("G"), figMap.get(solutionKey));
-            if (areEqual(candidate, figMap.get("H")))
-                return Integer.parseInt(solutionKey);
-        }
-
-        return pickTheOneNotSeen(figMap, solKeyList);
-    }
-
-    public int applyDiffABStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        BufferedImage difGH = imageUtilities.difference(figMap.get("G"), figMap.get("H"));
-
-        for (String solutionKey : solKeyList)
-            if (areEqual(difGH, figMap.get(solutionKey)))
-                return Integer.parseInt(solutionKey);
-
-        return pickTheOneNotSeen(figMap, solKeyList);
     }
 
     /**
@@ -433,5 +227,5 @@ public class Agent {
 
 /* Todo:
  * get rid of image compareImages delta buffered image
- * 
+ * check current image methods vs imageChops methods
  */
