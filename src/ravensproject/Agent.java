@@ -65,7 +65,6 @@ public class Agent {
      * @return your Agent's answer to this problem
      */
     public int Solve(RavensProblem problem) {
-        System.out.println("Solving " + problem.getName());
 
         // Retrieve figures from problem
         Map<String, RavensFigure> figureMap = problem.getFigures();
@@ -103,7 +102,7 @@ public class Agent {
         if (strategies.contains("productAC") && solution == -1)
             solution = strategy.productAC(figureImageMap, solutionKeyList);
         if (strategies.contains("diffAB") && solution == -1)
-            solution = strategy.diffAB(figureImageMap, solutionKeyList);
+            solution = strategy.differenceAB(figureImageMap, solutionKeyList);
         if (strategies.contains("shared") && solution == -1)
             solution = strategy.shared(figureImageMap, solutionKeyList);
         if (solution == -1 )
@@ -151,8 +150,8 @@ public class Agent {
         BufferedImage DEF = imageUtilities.multiply(DE, figureF);
 
         // differences
-        BufferedImage difAB = imageUtilities.difference(AB, rowAB);
-        BufferedImage difDE = imageUtilities.difference(DE, rowDE);
+        BufferedImage diffAB = imageUtilities.difference(AB, rowAB);
+        BufferedImage diffDE = imageUtilities.difference(DE, rowDE);
 
         // run the chosen strategies
         List<String> strategies = new ArrayList<>();
@@ -171,7 +170,7 @@ public class Agent {
             strategies.add("productAB");
         if (strategy.areEqual(AC, figureB) && strategy.areEqual(DF, figureE))
             strategies.add("productAC");
-        if (strategy.areEqual(difAB, figureC) && strategy.areEqual(difDE, figureF))
+        if (strategy.areEqual(diffAB, figureC) && strategy.areEqual(diffDE, figureF))
             strategies.add("diffAB");
         if (strategy.isShared(figureImageMap))
             strategies.add("shared");

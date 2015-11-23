@@ -166,52 +166,6 @@ public class Strategy {
     }
 
     /**
-     * This method determines a solution based on the comparison with G's similarity to H. If the solution
-     * is not equivalent to GH, the strategy is deemed "skippable".
-     *
-     * @param figMap
-     * @param solKeyList
-     * @return The solution based on its equivalence to the similarity between G and H
-     */
-    public int shared(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        BufferedImage sharedGH = imageUtilities.compareImages(figMap.get("G"), figMap.get("H")).get(0);
-
-        for (String solutionKey : solKeyList)
-            if (areEqual(sharedGH, figMap.get(solutionKey)))
-                return Integer.parseInt(solutionKey);
-        return -1;
-    }
-
-    /**
-     * This method determines the solution if it is not a likely one (not equivalent to any figures in
-     * the RPM. This is considered the "fallback" option for the agent, as it is more of a guess than
-     * anything.
-     *
-     * @param figMap
-     * @param solKeyList
-     * @return A solution that is unlike any of the figures
-     */
-    public int chooseLeastLikely(Map<String, BufferedImage> figMap, List<String> solKeyList) {
-        List<String> figures = new ArrayList<>();
-        List<String> answers = new ArrayList<>(solKeyList);
-        for (String figureKey : figMap.keySet())
-            if (!solKeyList.contains(figureKey))
-                figures.add(figureKey);
-
-        for (String figure : figures)
-            for (String solution : solKeyList)
-                if (areEqual(figMap.get(figure), figMap.get(solution)))
-                    if (answers.contains(solution))
-                        answers.remove(solution);
-
-        if (answers.size() == 1)
-            return Integer.parseInt(answers.get(0));
-        else if (answers.size() > 1 && answers.size() < 5)
-            return Integer.parseInt(answers.get(random.nextInt(answers.size())));
-        return -1;
-    }
-
-    /**
      * This method determines a solution based off of the column ADG. If a solution in the column CF# is
      * equivalent to ADG, that solution is deemed the correct one.
      *
@@ -304,7 +258,7 @@ public class Strategy {
      * @param solKeyList
      * @return The solution based on the equivalence to the difference between G and H
      */
-    public int diffAB(Map<String, BufferedImage> figMap, List<String> solKeyList) {
+    public int differenceAB(Map<String, BufferedImage> figMap, List<String> solKeyList) {
         BufferedImage diffGH = imageUtilities.difference(figMap.get("G"), figMap.get("H"));
 
         for (String solutionKey : solKeyList)
@@ -312,6 +266,52 @@ public class Strategy {
                 return Integer.parseInt(solutionKey);
 
         return chooseLeastLikely(figMap, solKeyList);
+    }
+
+    /**
+     * This method determines a solution based on the comparison with G's similarity to H. If the solution
+     * is not equivalent to GH, the strategy is deemed "skippable".
+     *
+     * @param figMap
+     * @param solKeyList
+     * @return The solution based on its equivalence to the similarity between G and H
+     */
+    public int shared(Map<String, BufferedImage> figMap, List<String> solKeyList) {
+        BufferedImage sharedGH = imageUtilities.compareImages(figMap.get("G"), figMap.get("H")).get(0);
+
+        for (String solutionKey : solKeyList)
+            if (areEqual(sharedGH, figMap.get(solutionKey)))
+                return Integer.parseInt(solutionKey);
+        return -1;
+    }
+
+    /**
+     * This method determines the solution if it is not a likely one (not equivalent to any figures in
+     * the RPM. This is considered the "fallback" option for the agent, as it is more of a guess than
+     * anything.
+     *
+     * @param figMap
+     * @param solKeyList
+     * @return A solution that is unlike any of the figures
+     */
+    public int chooseLeastLikely(Map<String, BufferedImage> figMap, List<String> solKeyList) {
+        List<String> figures = new ArrayList<>();
+        List<String> answers = new ArrayList<>(solKeyList);
+        for (String figureKey : figMap.keySet())
+            if (!solKeyList.contains(figureKey))
+                figures.add(figureKey);
+
+        for (String figure : figures)
+            for (String solution : solKeyList)
+                if (areEqual(figMap.get(figure), figMap.get(solution)))
+                    if (answers.contains(solution))
+                        answers.remove(solution);
+
+        if (answers.size() == 1)
+            return Integer.parseInt(answers.get(0));
+        else if (answers.size() > 1 && answers.size() < 5)
+            return Integer.parseInt(answers.get(random.nextInt(answers.size())));
+        return -1;
     }
 
 }
