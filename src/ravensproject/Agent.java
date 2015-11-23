@@ -96,46 +96,55 @@ public class Agent {
         List<String> strategies = determineStrategy(figureImageMap);
         System.out.println(strategies);
 
-        int solution;
+        int solution = -1;
 
         // Todo - change all to if statements only so skip is not done
         if (strategies.contains("row_equals")) {
             solution = strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (strategies.contains("one_of_each")) {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (strategies.contains("one_of_each") && solution == -1) {
             solution = strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (strategies.contains("one_cancels")) {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (strategies.contains("one_cancels") && solution == -1) {
             solution = strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (strategies.contains("cancel_out")) {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (strategies.contains("cancel_out") && solution == -1) {
             solution = strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (strategies.contains("common_perms")) {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (strategies.contains("common_perms") && solution == -1) {
             solution = strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (strategies.contains("productAB")) {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (strategies.contains("productAB") && solution == -1) {
             solution = strategy.applyProductABStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (strategies.contains("productAC")) {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (strategies.contains("productAC") && solution == -1) {
             solution = strategy.applyProductACStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (strategies.contains("diffAB")) {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (strategies.contains("diffAB") && solution == -1) {
             solution = strategy.applyDiffABStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else if (strategies.contains("shared")) {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (strategies.contains("shared") && solution == -1) {
             solution = strategy.applySharedStrategy(figureImageMap, solutionKeyList);
-            if (solution == -1)
-                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        } else {
+//            if (solution == -1)
+//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+        }
+        if (solution == -1 ){
             solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
         }
 
