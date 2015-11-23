@@ -94,59 +94,30 @@ public class Agent {
         }
 
         List<String> strategies = determineStrategy(figureImageMap);
-        System.out.println(strategies);
 
         int solution = -1;
 
         // Todo - change all to if statements only so skip is not done
-        if (strategies.contains("row_equals")) {
+        if (strategies.contains("row_equals"))
             solution = strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (strategies.contains("one_of_each") && solution == -1) {
+        if (strategies.contains("one_of_each") && solution == -1)
             solution = strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (strategies.contains("one_cancels") && solution == -1) {
+        if (strategies.contains("one_cancels") && solution == -1)
             solution = strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (strategies.contains("cancel_out") && solution == -1) {
+        if (strategies.contains("cancel_out") && solution == -1)
             solution = strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (strategies.contains("common_perms") && solution == -1) {
+        if (strategies.contains("common_perms") && solution == -1)
             solution = strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (strategies.contains("productAB") && solution == -1) {
+        if (strategies.contains("productAB") && solution == -1)
             solution = strategy.applyProductABStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (strategies.contains("productAC") && solution == -1) {
+        if (strategies.contains("productAC") && solution == -1)
             solution = strategy.applyProductACStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (strategies.contains("diffAB") && solution == -1) {
+        if (strategies.contains("diffAB") && solution == -1)
             solution = strategy.applyDiffABStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (strategies.contains("shared") && solution == -1) {
+        if (strategies.contains("shared") && solution == -1)
             solution = strategy.applySharedStrategy(figureImageMap, solutionKeyList);
-//            if (solution == -1)
-//                solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
-        if (solution == -1 ){
+        if (solution == -1 )
             solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
-        }
 
         return solution;
     }
@@ -186,23 +157,6 @@ public class Agent {
         // diffs
         BufferedImage difAB = imageUtilities.difference(AB, rowAB);
         BufferedImage difDE = imageUtilities.difference(DE, rowDE);
-
-//        if (problem.equals("Basic Problem D-09")) {
-//            JFrame frame = new JFrame();
-//            frame.getContentPane().setLayout(new FlowLayout());
-//            frame.getContentPane().add(new JLabel(new ImageIcon(ABC)));
-//            frame.getContentPane().add(new JLabel(new ImageIcon(DEF)));
-//            frame.pack();
-//            frame.setVisible(true);
-//            try {
-//                Thread.sleep(11000);
-//            } catch(InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
-//        }
-
-
-//        System.out.println("areEqual = "+(strategy.areEqual(rowAB, rowBC) && strategy.areEqual(rowDE, rowEF)));
 
         List<String> strategies = new ArrayList<>();
 
@@ -251,10 +205,3 @@ public class Agent {
     }
 
 }
-
-/* Todo:
- * get rid of image compareImages delta buffered image
- * check current image methods vs imageChops methods
- * guess more
- * make it where multiple strategies are chosen
- */

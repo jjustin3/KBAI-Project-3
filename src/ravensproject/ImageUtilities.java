@@ -32,7 +32,7 @@ public class ImageUtilities {
         return colorsMap;
     }
 
-    // Todo - return only one image (delta not needed)
+    // used for the same purpose as add (as of right now)
     public List<BufferedImage> compareImages(BufferedImage image1, BufferedImage image2) {
         BufferedImage common = add(image1, image2);
         BufferedImage delta = difference(image1, image2);
@@ -44,7 +44,8 @@ public class ImageUtilities {
 
 
     // Operator methods
-    //what they have in common!
+
+    // what they have in common!
     public BufferedImage add(BufferedImage image1, BufferedImage image2) {
         int width = Math.max(image1.getWidth(), image2.getWidth());
         int height = Math.max(image1.getHeight(), image2.getHeight());
@@ -63,7 +64,7 @@ public class ImageUtilities {
         return newImage;
     }
 
-    //combine images!
+    // combine images!
     public BufferedImage multiply(BufferedImage image1, BufferedImage image2) {
         int width = Math.max(image1.getWidth(), image2.getWidth());
         int height = Math.max(image1.getHeight(), image2.getHeight());
@@ -82,7 +83,7 @@ public class ImageUtilities {
         return newImage;
     }
 
-    //take multiplied and subtract add (what they don't have in common)!
+    // take multiplied and subtract add (what they don't have in common)!
     public BufferedImage difference(BufferedImage image1, BufferedImage image2) {
         int width = Math.max(image1.getWidth(), image2.getWidth());
         int height = Math.max(image1.getHeight(), image2.getHeight());

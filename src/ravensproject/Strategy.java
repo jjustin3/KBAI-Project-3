@@ -37,7 +37,6 @@ public class Strategy {
         Map<String, Integer> image1Colors = imageUtilities.getColors(image1);
         Map<String, Integer> image2Colors = imageUtilities.getColors(image2);
 
-        // Todo - might be able to trim this down and only work with Map
         int[] image1Black = new int[2];
         if (image1Colors.keySet().size() > 1) {
             image1Black[0] = image1Colors.get("black");
@@ -66,13 +65,10 @@ public class Strategy {
             }
         }
 
-//        System.out.println("dist: "+dist+"     blk: "+Math.abs(image1Black[0] - image2Black[0]));
-
-        return dist < 1.3 && Math.abs(image1Black[0] - image2Black[0]) < 205; // < 1.1 and < 105 // < 1.3 and < 205
+        return dist < 1.6 && Math.abs(image1Black[0] - image2Black[0]) < 205;
     }
 
     public boolean isShared(Map<String, BufferedImage> figureImageMap) {
-        // Todo - might not need delta image [1] ever!
         BufferedImage sharedAB = imageUtilities.compareImages(figureImageMap.get("A"), figureImageMap.get("B")).get(0);
         BufferedImage sharedDE = imageUtilities.compareImages(figureImageMap.get("D"), figureImageMap.get("E")).get(0);
 
@@ -129,8 +125,6 @@ public class Strategy {
         } else {
             return answers.get(0);
         }
-
-//        return -1;
     }
 
     public int applySharedStrategy(Map<String, BufferedImage> figMap, List<String> solKeyList) {
@@ -138,7 +132,7 @@ public class Strategy {
 
         for (String solutionKey : solKeyList)
             if (areEqual(sharedGH, figMap.get(solutionKey)))
-                return Integer.parseInt(solutionKey);
+                return Integer.parseInt(solutionKey); // Todo - return instead a list of possible answers
         return -1;
     }
 
@@ -159,7 +153,7 @@ public class Strategy {
 
         if (answers.size() == 1)
             return Integer.parseInt(answers.get(0));
-        else if (answers.size() > 1 && answers.size() < 3) // toggle after penalty determined
+        else if (answers.size() > 1 && answers.size() < 4) // Todo - increase to < 4 or 5 for guessing
             return Integer.parseInt(answers.get(random.nextInt(answers.size())));
         return -1;
     }
