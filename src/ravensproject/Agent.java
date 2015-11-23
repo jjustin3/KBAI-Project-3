@@ -1,10 +1,8 @@
 package ravensproject;
 
 // Uncomment these lines to access image processing.
-import java.awt.*;
 import java.io.File;
 import javax.imageio.ImageIO;
-import javax.swing.*;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -26,11 +24,8 @@ import java.util.List;
  */
 public class Agent {
 
-    private Generator generator;
-    private Random random;
     private ImageUtilities imageUtilities;
     private Strategy strategy;
-    private String problem;
 
     /**
      * The default constructor for your Agent. Make sure to execute any
@@ -41,8 +36,6 @@ public class Agent {
      * 
      */
     public Agent() {
-        generator = new Generator();
-        random = new Random();
         imageUtilities = new ImageUtilities();
         strategy = new Strategy(imageUtilities);
     }
@@ -73,7 +66,6 @@ public class Agent {
      */
     public int Solve(RavensProblem problem) {
         System.out.println("Solving " + problem.getName());
-        this.problem = problem.getName();
 
         // Retrieve figures from problem
         Map<String, RavensFigure> figureMap = problem.getFigures();
@@ -96,32 +88,36 @@ public class Agent {
         List<String> strategies = determineStrategy(figureImageMap);
 
         int solution = -1;
-
-        // Todo - change all to if statements only so skip is not done
         if (strategies.contains("row_equals"))
-            solution = strategy.applyRowEqualsStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.rowEquals(figureImageMap, solutionKeyList);
         if (strategies.contains("one_of_each") && solution == -1)
-            solution = strategy.applyOneOfEachStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.oneOfEach(figureImageMap, solutionKeyList);
         if (strategies.contains("one_cancels") && solution == -1)
-            solution = strategy.applyOneCancelsStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.oneCancels(figureImageMap, solutionKeyList);
         if (strategies.contains("cancel_out") && solution == -1)
-            solution = strategy.applyCancelOutStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.cancelOut(figureImageMap, solutionKeyList);
         if (strategies.contains("common_perms") && solution == -1)
-            solution = strategy.applyCommonPermsStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.commonPermutations(figureImageMap, solutionKeyList);
         if (strategies.contains("productAB") && solution == -1)
-            solution = strategy.applyProductABStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.productAB(figureImageMap, solutionKeyList);
         if (strategies.contains("productAC") && solution == -1)
-            solution = strategy.applyProductACStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.productAC(figureImageMap, solutionKeyList);
         if (strategies.contains("diffAB") && solution == -1)
-            solution = strategy.applyDiffABStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.diffAB(figureImageMap, solutionKeyList);
         if (strategies.contains("shared") && solution == -1)
-            solution = strategy.applySharedStrategy(figureImageMap, solutionKeyList);
+            solution = strategy.shared(figureImageMap, solutionKeyList);
         if (solution == -1 )
-            solution = strategy.pickTheOneNotSeen(figureImageMap, solutionKeyList);
+            solution = strategy.chooseLeastLikely(figureImageMap, solutionKeyList);
 
         return solution;
     }
 
+    /**
+     * This method determines strategies based off of the order of importance of those strategies.
+     *
+     * @param figureImageMap
+     * @return The chosen strategies.
+     */
     public List<String> determineStrategy(Map<String, BufferedImage> figureImageMap) {
 
         // get the individual images
@@ -134,19 +130,19 @@ public class Agent {
         BufferedImage figureG = figureImageMap.get("G");
         BufferedImage figureH = figureImageMap.get("H");
 
-        // overlays
+        // similarities
         BufferedImage rowAB = imageUtilities.add(figureA, figureB);
         BufferedImage rowBC = imageUtilities.add(figureB, figureC);
         BufferedImage rowDE = imageUtilities.add(figureD, figureE);
         BufferedImage rowEF = imageUtilities.add(figureE, figureF);
 
+        // combinations
         BufferedImage colAD = imageUtilities.multiply(figureA, figureD);
         BufferedImage colADG = imageUtilities.multiply(colAD, figureG);
 
         BufferedImage colBE = imageUtilities.multiply(figureB, figureE);
         BufferedImage colBEH = imageUtilities.multiply(colBE, figureH);
 
-        // common permutations
         BufferedImage AB = imageUtilities.multiply(figureA, figureB);
         BufferedImage AC = imageUtilities.multiply(figureA, figureC);
         BufferedImage ABC = imageUtilities.multiply(AB, figureC);
@@ -154,12 +150,12 @@ public class Agent {
         BufferedImage DF = imageUtilities.multiply(figureD, figureF);
         BufferedImage DEF = imageUtilities.multiply(DE, figureF);
 
-        // diffs
+        // differences
         BufferedImage difAB = imageUtilities.difference(AB, rowAB);
         BufferedImage difDE = imageUtilities.difference(DE, rowDE);
 
+        // run the chosen strategies
         List<String> strategies = new ArrayList<>();
-
         if (strategy.areEqual(figureA, figureB) && strategy.areEqual(figureB, figureC))
             if (strategy.areEqual(figureD, figureE) && strategy.areEqual(figureE, figureF))
                 strategies.add("row_equals");

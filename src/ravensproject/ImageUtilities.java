@@ -43,7 +43,7 @@ public class ImageUtilities {
     }
 
 
-    // Operator methods
+    // OPERATOR METHODS
 
     // what they have in common!
     public BufferedImage add(BufferedImage image1, BufferedImage image2) {
